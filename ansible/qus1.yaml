@@ -1,0 +1,61 @@
+Q1 . Install and Configure Ansible on the control node as follows:
+  * Install the required packages.
+  * Create a static inventory file called /home/student/ansible/inventory as follows:
+      - system1 is a member of the dev host group
+      - system2 is member of the test host group
+      - system3 and system4 are member of the prod host group
+      - system5 is member of the balancers host group
+      - The prod group is a member of the webservers host group
+  * Create a configuration file called /home/admin/ansible/ansible.cfg
+- The host inventory file is /home/admin/ansible/inventory
+- The location of role used in playbooks include /home/admin/ansible/roles
+- The Install Ansible Content Collection /home/admin/ansible/mycollection
+  
+  Answer 1 :-
+  
+  In RHCEv9 Exam by default ssh connection is disabled . So, First at all you need to enable ssh connection for taking login access via base system terminal
+  
+  [admin@control ~]$ sudo yum install ansible-core  ansible-navigator ansible* tree vim -y
+  
+  [admin@control ~]$ mkdir -p  /home/student/ansible/mycollection
+  [admin@control ~]$  vim ansible/inventory
+  
+  [dev]
+  system1
+  
+  [test]
+  system2
+  
+  [prod]
+  system3
+  system4
+  
+  [balancers]
+  system5
+  
+  [webservers:children]
+  prod
+  
+  :wq!
+  
+  [admin@control ~]$ sudo cp /etc/ansible/ansible.cfg  ansible/
+  
+  [admin@control ~]$  vim ansible/ansible.cfg
+  
+  [defaults]
+  
+  inventory      =  /home/admin/ansible/inventory  (uncomment the inventory line and set this path)
+
+roles_path    = /etc/ansible/roles:/home/admin/ansible/roles:/usr/share/ansible/roles: /home/student/ansible/mycollection  (Search roles_path then add this defined value)
+  
+  [become_privedge]
+  become = true                     (Search become in file)
+  
+  
+  [admin@control ~]$  vim .bashrc
+  
+  export ANSIBLE_CONFIG=/home/admin/ansible/ansible.cfg  (bottom in the file)
+  
+  :wq!
+  
+  [admin@control ~]$ ansible all -m ping (Check whether task is implement sucessfull or not)
