@@ -1,0 +1,67 @@
+  16. Storage LVM
+    Create & use a logical Volume
+    Create a playbook called /home/admin/ansible/ansible/lv.yml that runs on
+      all managed nodes that does the following:
+    * Creates a logical volume with these requirement:
+        - The logical Volume is Created in the research volume group
+        - The logical volume name is data
+        - The logical volume size is 1500 Mib
+    * Format the logical volume with the ext4 file system
+    * if the requested logical volume size cannot be created, the error message
+    Could not create logical volume of that size
+    should be displayed and size 800 MiB should be used instead.
+    * f the volume research does not exist, the error message
+    volume group does not exist
+    should be displayed
+    * Does NOT mount the logical volume in any way.
+
+
+    [admin@control ~]$ cd ansible/
+    
+    [admin@control ansible]$ vim lv.yml
+      - hosts: all
+        tasks:
+          - block:
+              - block:
+                  - community.general.lvol:
+                      vg: research
+                      lv: data
+                      size: 1500m
+                when: ansible_lvm.vgs.research.size_g > '1500MiB'
+
+              - block:
+                  - debug:
+                      msg: "Size is not present"
+                  - community.general.lvoll:
+                      vg: research
+                      lv: data
+                      size: 800m
+                when: ansible_lvm.vgs.research.size_g < '1500MiB'
+            when: ansible_lvm.vgs.research is defined
+
+          - name: Format filesystem
+            filesystem:
+              fstype: ext4
+              dev: /dev/research/data
+            when: ansible_lvm.vgs.research is defined
+
+          - name: Mount partitions
+            mount:
+              path: /mnt
+              src: /dev/research/data
+              fstype: ext4
+              opts: defaults
+              state: present
+            when: ansible_lvm.vgs.research is defined
+
+          - debug:
+              msg: "device is not defined"
+            when: ansible_lvm.vgs.research is not defined
+
+    :wq!
+
+      (Note: May be this variable not worked in your case, then use ansible all -m setup -a filter=lvm,  get proper vairable like this solution  )
+
+  # Note:- IF Exam has not define mounting logical volume related question then you can skip this " -name: Mount partitions" steps, if define you can do it this method
+
+    [admin@control ansible]$  ansible-playbook lv.yml

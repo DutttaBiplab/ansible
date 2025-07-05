@@ -1,0 +1,34 @@
+  8. Use roles from Ansible Galaxy Create a playbook called /home/admin/ansible/roles.yml
+    * The playbook contains a play that runs on host in the balances host group and uses the balances role. -
+    This role configures a service to load balance web server request between hosts in the webserver host
+    group. - Browsing to host in the balances host group ( for example
+  http://system5.domain1.example.com) produces the following output: Welcome to
+    system3.domain1.example.com on 172.24.1.8
+  - Reloading the Browser produces output from the AlterNet web server: Welcome to
+    system4.domain1.example.com on 172.24.1.9
+    * The Playbook contains a play the runs on hosts in webserver host group and user the phpinfo role.
+  Browsing to host in the webserver host group with the URL /hell.php produces the following output :
+    Hello PHP World from FQDN - For example Browsing to http://system3.domain1.example.com/hello.php
+  produces the following output: Hello PHP World from system3.domain1.example.com along with various
+    details of the PHP configuration include the version of PHP that is installed. @powered by
+    JSNH Similarly, Browsing to http://system4.doamin1.example.com/hello.php, produces the following
+  output: Hello PHP World from system4.domain1.example.com along with various details of the PHP
+    configuration including the version of PHP that is installed.
+    
+    
+    [admin@control ~]$ cd ansible/
+    
+    [admin@control ansible]$ vim roles.yml
+
+  - hosts: balancers
+    roles:
+      - balancer
+
+  - hosts: webservers
+    roles:
+      - phpinfo
+
+    :wq!
+
+    [admin@control ansible]$ ansible-navigator run  roles.yml -m stdout
+    [admin@control ansible]$ curl http://serverd.lab.example.com
