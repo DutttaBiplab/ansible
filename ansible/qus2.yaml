@@ -1,0 +1,43 @@
+  Create a playbook for yum configuration [In Ex294v9]
+    As a system administrator you will need install software on the managed nodes.
+    Create a playbook called /home/admin/ansible/yum.yml , the user ansible create a yum repository on
+  each of the managed nodes as follows:
+  Repository 1:
+    - The name of the repository is EX294_BASE @powered
+    by JSNH
+  - The description is EX294 base software
+  - The base URL is http://server.network.example.com/BaseOs
+  - GPG signature checking is enabled
+  - The repository is enabled
+  Repository 2: -- The name of the repository is EX294_STREM
+    - The description is EX294 base software
+    - The base URL is http://server.network.example.com/AppStream - GPG signature
+    checking is enabled
+  - The GPG Key URL is http://server.network.example.com/RHEL/RPM-GPG-KEY-redhat-release -
+    The repository is enabled
+    
+    
+    
+    vim yum.yml
+
+  - hosts: all
+    tasks:
+      - name: repo for appstream
+        yum_repository:
+          name: EX294_STREAM
+          description:  EX294
+          baseurl: https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+          enabled: 1
+          gpgcheck: 1
+          gpgkey: http://server.network.example.com/RHEL/RPM-GPG-KEY-redhat-release
+
+      - name: repo for appstream
+        yum_repository:
+          name: EX294_BASE
+          description:  EX294
+          baseurl: https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+          enabled: 1
+          gpgcheck: 1
+          gpgkey: http://server.network.example.com/RHEL/RPM-GPG-KEY-redhat-release
+
+    :wq!

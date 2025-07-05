@@ -1,0 +1,36 @@
+  3. Install packages
+  Create a playbook called /home/admin/ansible/packages.yml that:
+    - Installs the php & mariadb on hosts in the dev,test and prod host group
+    - Installs the RPM Development Tools package group on host in the dev host group
+    - Update all packages to the latest version on host in the dev host group
+    
+    
+    [admin@control ansible]$ vim package.yml
+
+  - name: package installation
+    hosts: dev,test
+    tasks:
+      - name: installing php and mariadb-server
+        ansible.builtin.dnf:
+        name:
+          - vsftpd
+          - mariadb-server
+        state: present
+
+  - name: group package installation
+    hosts: prod
+    tasks:
+      - name: installing group package 'Development tools'
+        ansible.builtin.dnf:
+          name: '@RPM Development Tools'
+          state: present
+
+  - name: update packages
+    hosts: dev
+    tasks:
+      - name: updating all
+        ansible.builtin.dnf:
+          name: '*'
+          state: latest
+
+    :wq!
