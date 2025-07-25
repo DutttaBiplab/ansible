@@ -21,3 +21,4 @@ df -hP | awk 'NR>1' | while read -r line; do
         echo "ALERT: $MOUNT is ${USAGE}% full (Threshold: ${THRESHOLD}%)" >> "$ALERT_LOG"
     fi
 done
+
