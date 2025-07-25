@@ -61,3 +61,81 @@ DISK_USE_PERCENT=$(echo "$DISK_LINE" | awk '{print $5}')
   echo ""
 } >> "$LOG_FILE"
 
+# 1. Uptime
+echo "Uptime:"
+uptime
+echo ""
+
+# 2. CPU Info and Load
+echo "🧠 CPU Usage & Load Average:"
+echo "Load Average: $(uptime | awk -F'load average:' '{ print $2 }')"
+mpstat 1 1 | grep "Average"
+echo ""
+
+# 3. Memory and Swap
+echo "💾 Memory and Swap Usage:"
+free -h
+echo ""
+
+# 4. Disk Usage
+echo "🧱 Disk Usage:"
+df -h | grep -v tmpfs
+echo ""
+
+# 5. Top 5 Processes (CPU and Memory)
+echo "📦 Top 5 CPU-consuming processes:"
+ps -eo pid,ppid,cmd,%mem,%cpu --sort=-%cpu | head -n 6
+echo ""
+
+# 6. Network Information
+echo "🌐 Network Info:"
+ip addr show | grep inet
+echo ""
+
+echo "🌐 Network Stats:"
+cat /proc/net/dev
+echo ""
+
+# 7. Open Ports and Listening Services
+echo "🔌 Open Listening Ports:"
+ss -tuln
+echo ""
+
+# 8. Firewall & SELinux Status
+echo "🛡️  Firewall Status:"
+systemctl is-active firewalld 2>/dev/null || echo "Firewalld not installed"
+echo ""
+
+
+# 9. Last Reboot
+echo "🔁 Last Reboot:"
+who -b
+echo ""
+
+# 10. Running Services
+echo "🧪 Running Critical Services (ssh, crond, etc.):"
+for svc in sshd crond network firewalld; do
+    systemctl is-active --quiet $svc && echo "$svc is running" || echo "$svc is NOT running"
+done
+
+echo ""
+
+# 11. NIC Teaming / Bonding Status
+echo "🔗 NIC Teaming / Bonding Status:"
+
+if [ -d /proc/net/bonding ]; then
+  for bond in /proc/net/bonding/*; do
+    echo ""
+    echo "Interface: $(basename "$bond")"
+    cat "$bond"
+  done
+else
+  echo "No bonding interfaces found."
+fi
+echo ""
+
+echo ""
+echo "✅ Health Check Completed at: $TIMESTAMP"
+echo "==========================================="
+echo ""
+echo ""
